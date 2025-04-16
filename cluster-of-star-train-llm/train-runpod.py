@@ -37,41 +37,16 @@ context_length = 512
 tokenizer =  LlamaTokenizer.from_pretrained("facebook/MobileLLM-125M")
 tokenizer.add_special_tokens({"bos_token": "<s>", "eos_token": "</s>"})
 
-def tokenize(elements):
-    # Concatenate all texts in the batch with EOS token between them
-    concatenated_text = tokenizer.eos_token.join(elements["text"])
-    
-    # Tokenize the concatenated text
-    outputs = tokenizer(
-        concatenated_text,
-        truncation=False,  # Don't truncate yet, we'll handle chunking manually
-        return_tensors="pt",
-        verbose=False
-    )
-    
-    input_ids = outputs["input_ids"][0]  # Extract the token IDs
-    
-    # Create chunks of size context_length
-    total_length = input_ids.size(0)
-    chunks = []
-    
-    for i in range(0, total_length, context_length):
-        chunk = input_ids[i:i + context_length].tolist()
-        # Only keep chunks that are full or close to full (e.g., at least 50% of context_length)
-        if len(chunk) >= 0.5 * context_length:
-            chunks.append(chunk)
-    
-    return {"input_ids": chunks}
-
 tokenized_datasets = raw_datasets.map(
-    tokenize, 
+    lambda examples: tokenizer(examples["text"]), 
     batched=True, 
-    # batch_size=32,  # Adjust based on your memory constraints
-    num_proc=4, 
+    # batch_size=1000,  # Adjust based on your memory constraints
+    num_proc=50, 
     remove_columns= raw_datasets["train"].column_names
 )
 print(tokenized_datasets)
 tokenized_datasets.save_to_disk("tokenized_dataset")
+tokenized_datasets.push_to_hub("tinystories_llama_nogroup")
 print("============Tokenized dataset saved to disk.")
 # tokenized_datasets = load_from_disk("tokenized_dataset")
 
@@ -108,10 +83,10 @@ print("Model config PAD ID:", model.config.pad_token_id)
 
 args = TrainingArguments(
     output_dir="llama-fin",
-    per_device_train_batch_size=32,
-    per_device_eval_batch_size=32,
+    per_device_train_batch_size=512,
+    per_device_eval_batch_size=512,
     eval_strategy="steps",
-    eval_steps=5_000,
+    eval_steps=3_000,
     logging_steps=3_000,
     gradient_accumulation_steps=1,
     weight_decay=0.1,
