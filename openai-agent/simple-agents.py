@@ -1,12 +1,9 @@
 import json
 import os
-from typing import Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
-from utils import function_to_schema
-
 from openai import OpenAI
+from utils import function_to_schema
 
 load_dotenv()
 
@@ -39,13 +36,11 @@ def look_up_item(search_query):
 
 
 def execute_refund(item_id, reason="not provided"):
-
     print("Summary:", item_id, reason)  # lazy summary
     return "success"
 
 
 def run_full_turn(system_message, messages):
-
     response = client.chat.completions.create(
         model="openai/gpt-4o-mini",
         messages=[{"role": "system", "content": system_message}] + messages,
@@ -63,12 +58,10 @@ tools = [execute_refund, look_up_item]
 
 
 def run_full_turn_with_tools(system_message, tools, messages):
-
     num_init_messages = len(messages)
     messages = messages.copy()
 
     while True:
-
         # turn python functions into tools and save a reverse map
         tool_schemas = [function_to_schema(tool) for tool in tools]
         tools_map = {tool.__name__: tool for tool in tools}
