@@ -97,7 +97,6 @@ def _(chat):
     # it is hard to find an appropriate example to show the effect of cot
     # existing examples on Wei's paper now has been part of the training data
     # so they are not suitable for testing cot
-    # we can use repeated inference calls to generate a few shot example
     # see some examples https://openai.com/index/learning-to-reason-with-llms/
 
     print(chat([user_few_shot]))
