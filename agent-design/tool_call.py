@@ -26,14 +26,7 @@ def get_name(name: str) -> str:
 
 
 def browse_file(dir: str) -> str:
-    """Browse files in the given directory.
-
-    Args:
-        dir (str): The directory to browse.
-
-    Returns:
-        A list of files in the directory.
-    """
+    """Browse files in the given directory."""
     if not os.path.exists(dir):
         return f"Directory {dir} does not exist."
     try:
@@ -66,7 +59,7 @@ def main():
 
     input = tokenizer.apply_chat_template(messages, tools=tools, tokenize=False)
     # observe the templated input before and after adding tools (adding tools apply additional instructions to the system prompt)
-    # see details here: https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Instruct/blob/main/chat_template.json
+    # see example template from llama 4 here: https://huggingface.co/meta-llama/Llama-4-Scout-17B-16E-Instruct/blob/main/chat_template.json
     print(input)
 
     try:
