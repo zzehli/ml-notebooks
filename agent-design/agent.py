@@ -1,42 +1,70 @@
 import json
 import os
 import traceback
+from typing import List, Optional
 
 from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from huggingface_hub import InferenceClient
+from litellm import completion
 from openai import OpenAI
 from utils import Tool, function_to_schema
 
 load_dotenv()
 
+default_system_message = "you are a helpful assistant. Answer the user's questions in a concise manner. Use appropriate tools when necessary."
 
 class Agent:
-    def __init__(self, tools=None):
-        self.system_message = "you are a helpful assistant. Answer the user's questions in a concise manner. Use appropriate tools when necessary."
-        self.messages = [{"role": "system", "content": self.system_message}]
+    def __init__(self, tools=None, system_message=default_system_message, client="github"):
+        self.messages = [{"role": "system", "content": system_message}]
         self.tools = tools if tools is not None else []
+        self.client_type = client
         # switched to openai since it has better tool calling
-        self.client = OpenAI(
-            api_key=os.environ.get("GITHUB_OPENAI_API_KEY"),
-            base_url="https://models.github.ai/inference",
-        )
+        match client:
+            case "github":
+                self.client = OpenAI(
+                    api_key=os.environ.get("GITHUB_OPENAI_API_KEY"),
+                    base_url="https://models.github.ai/inference",
+                )
+                self.model = "openai/gpt-4.1"
+            case "google":
+                self.model = "gemini/gemini-2.0-flash"
+            case "huggingface":
+                self.client = InferenceClient(
+                    api_key=os.getenv("HUGGINGFACE_API_KEY")
+                )
+                self.model = "meta-llama/Llama-3.3-70B-Instruct"
+            case _:
+                raise ValueError(f"Invalid client: {client}")
 
     def _call(self, input, stop=None):
-        return self.client.chat.completions.create(
-            model="openai/gpt-4.1",
-            messages=input,
-            tools=[function_to_schema(x) for x in self.tools],
-            tool_choice="auto",
-            stop=stop,
+        match self.client_type:
+            # google's function calling does not need to be converted to schema
+            case "google":
+                return completion(
+                    model=self.model, 
+                    messages=input,
+                    tools=[function_to_schema(x) for x in self.tools],
+                    stop=stop,
+                    tool_choice="auto",
+                )
+            case _:
+                return self.client.chat.completions.create(
+                    model=self.model,
+                    messages=input,
+                    tools=[function_to_schema(x) for x in self.tools],
+                    tool_choice="auto",
+                    stop=stop,
         )
 
     def _execute_tool(self, tool_calls):
         tool_results = []
         for tool_call in tool_calls:
-            # a more generic tool execution function, more prune to errors
+            # a more generic tool execution function, more prune to errors, only works for string parameters, see react_agent for type conversion
             tool_name = tool_call.function.name
             args = json.loads(tool_call.function.arguments)
             print(f"Executing tool: {tool_name} with args: {args}")
-            print(f"all tools: {self.tools}")
             tool_dict = {tool.__name__: tool for tool in self.tools}
             res = tool_dict[tool_name](**args)
             print(f"Tool result: {res}")
@@ -83,6 +111,6 @@ class Agent:
 
 
 if __name__ == "__main__":
-    agent = Agent(tools=[Tool.browse_file])
+    agent = Agent(tools=[Tool.browse_file], client="github")
     # agent = Agent()
     agent.run()

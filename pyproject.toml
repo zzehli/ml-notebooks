@@ -6,7 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.7.0",
+    "google-genai>=1.18.0",
     "huggingface-hub>=0.31.2",
+    "litellm>=1.72.0",
     "marimo>=0.13.15",
     "openai>=1.77.0",
     "pydantic>=2.11.4",
