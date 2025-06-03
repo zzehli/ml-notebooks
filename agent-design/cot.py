@@ -6,7 +6,7 @@ app = marimo.App(width="medium")
 
 @app.cell
 def _():
-    from client import chat
+    from utils import chat
 
     return (chat,)
 
