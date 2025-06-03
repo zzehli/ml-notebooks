@@ -19,7 +19,7 @@ class Directory(BaseModel):
     dir: str
 
 
-tools = [function_to_schema(Tool.get_name), function_to_schema(Tool.browse_file)]
+tools = [function_to_schema(Tool.browse_file)]
 
 
 def main():

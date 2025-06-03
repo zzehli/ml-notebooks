@@ -1,8 +1,8 @@
 import os
 
-from client import chat
 from dotenv import load_dotenv
 from huggingface_hub import login
+from utils import chat
 
 load_dotenv()
 

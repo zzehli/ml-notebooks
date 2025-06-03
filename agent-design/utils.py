@@ -10,11 +10,6 @@ load_dotenv()
 
 class Tool:
     @staticmethod
-    def get_name(name: str) -> str:
-        """Get the name of the anyone the user asks."""
-        return "John Doe"
-
-    @staticmethod
     def browse_file(dir: str) -> str:
         """Browse files in the given directory."""
         if not os.path.exists(dir):
