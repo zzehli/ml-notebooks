@@ -1,0 +1,140 @@
+from collections import defaultdict
+from dataclasses import dataclass
+from typing import Any, Callable, Dict, List
+
+
+@dataclass
+class Message:
+    """A message passed between nodes in the graph."""
+
+    sender: str
+    content: Any
+
+
+class Node:
+    """A node in the computation graph that can process messages and produce outputs."""
+
+    def __init__(
+        self, node_id: str, process_fn: Callable[[List[Message]], Dict[str, Any]]
+    ):
+        self.node_id = node_id
+        self.process_fn = process_fn
+        self.incoming_messages: List[Message] = []
+
+    def receive_message(self, message: Message):
+        """Add a message to the node's incoming message queue."""
+        self.incoming_messages.append(message)
+
+    def process_messages(self) -> Dict[str, Any]:
+        """Process all incoming messages and produce outputs."""
+        if not self.incoming_messages:
+            return {}
+
+        # Process messages using the node's processing function
+        outputs = self.process_fn(self.incoming_messages)
+
+        # Clear processed messages
+        self.incoming_messages = []
+
+        return outputs
+
+
+class Graph:
+    """A computation graph that manages message passing between nodes."""
+
+    def __init__(self):
+        self.nodes: Dict[str, Node] = {}
+        self.edges: Dict[str, List[str]] = defaultdict(list)
+        self.step_count = 0
+        self.output_trace = []
+
+    def add_node(self, node: Node):
+        """Add a node to the graph."""
+        self.nodes[node.node_id] = node
+
+    def add_edge(self, from_node: str, to_node: str):
+        """Add a directed edge between nodes."""
+        if from_node not in self.nodes or to_node not in self.nodes:
+            raise ValueError("Both nodes must exist in the graph")
+        self.edges[from_node].append(to_node)
+
+    def step(self) -> bool:
+        """Execute one superstep of the computation.
+        Returns True if any messages were processed, False if the computation is complete.
+        """
+        self.step_count += 1
+        messages_processed = False
+
+        # Process all nodes and collect their outputs
+        node_outputs = {}
+        for node_id, node in self.nodes.items():
+            outputs = node.process_messages()
+            if outputs:
+                messages_processed = True
+                node_outputs[node_id] = outputs
+                self.output_trace.append({node_id: outputs})
+                # print(f"message from {node_id}: {outputs}")
+
+        # Distribute messages to target nodes
+        for source_id, outputs in node_outputs.items():
+            for target_id in self.edges[source_id]:
+                message = Message(sender=source_id, content=outputs)
+                self.nodes[target_id].receive_message(message)
+
+        return messages_processed
+
+    def get_output_trace(self) -> Dict[str, Any]:
+        """Get all outputs from all nodes in the graph."""
+        return self.output_trace
+
+    def run(self, max_steps=6) -> Dict[str, Any]:
+        """Run graph and return output trace"""
+        self.step_count = 0
+        while self.step_count < max_steps:
+            if not self.step():
+                break
+        return self.get_output_trace()
+
+
+# Example usage
+def create_example_graph():
+    # Create nodes with simple processing functions
+    def double_numbers(messages: List[Message]) -> Dict[str, Any]:
+        values = [msg.content["value"] for msg in messages]
+        return {"value": sum(values) * 2}
+
+    def add_one(messages: List[Message]) -> Dict[str, Any]:
+        values = [msg.content["value"] for msg in messages]
+        return {"value": sum(values) + 1}
+
+    # Create graph
+    graph = Graph()
+
+    # Add nodes
+    node1 = Node("node1", double_numbers)
+    node2 = Node("node2", add_one)
+    node3 = Node("node3", double_numbers)
+
+    graph.add_node(node1)
+    graph.add_node(node2)
+    graph.add_node(node3)
+
+    # Add edges
+    graph.add_edge("node1", "node2")
+    graph.add_edge("node2", "node3")
+
+    # Initialize with a message
+    node1.receive_message(Message("initial", {"value": 1}))
+
+    return graph
+
+
+if __name__ == "__main__":
+    # Create and run example graph
+    graph = create_example_graph()
+
+    # Run until no more messages are being processed
+    res = graph.run()
+    print("==================run trace====================")
+    for m in res:
+        print(m)
