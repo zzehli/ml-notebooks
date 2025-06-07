@@ -45,6 +45,7 @@ class Graph:
     def __init__(self):
         self.nodes: Dict[str, Node] = {}
         self.edges: Dict[str, List[str]] = defaultdict(list)
+        self.conditional_edges: Dict[str, Any] = {}
         self.step_count = 0
         self.output_trace = []
 
@@ -57,6 +58,31 @@ class Graph:
         if from_node not in self.nodes or to_node not in self.nodes:
             raise ValueError("Both nodes must exist in the graph")
         self.edges[from_node].append(to_node)
+    
+    def add_conditional_edge(
+        self,
+        from_node: str,
+        condition: Callable[[Dict[str, Any]], bool],
+        to_nodes: Dict[bool, str],
+    ):
+        """
+        Add a conditional edge that routes messages based on a condition.
+
+        Args:
+            from_node: The node that will be the source of the conditional edge.
+            condition: A function that takes the output of the from_node and returns a boolean.
+            to_nodes: A dictionary of boolean values to node ids.
+        """
+        if from_node not in self.nodes:
+            raise ValueError("From node must exist in the graph")
+        for to_node in to_nodes.values():
+            if to_node not in self.nodes:
+                raise ValueError(f"To node {to_node} must exist in the graph")
+
+        self.conditional_edges[from_node] = {
+            "condition": condition,
+            "targets": to_nodes,
+        }
 
     def step(self) -> bool:
         """Execute one superstep of the computation.
@@ -77,9 +103,25 @@ class Graph:
 
         # Distribute messages to target nodes
         for source_id, outputs in node_outputs.items():
-            for target_id in self.edges[source_id]:
+            if source_id in self.conditional_edges:
+                # Handle conditional routing
+                conditional_edge = self.conditional_edges[source_id]
+                condition_fn = conditional_edge["condition"]
+                target_map = conditional_edge["targets"]
+                print(f"outputs: {outputs}")
+                if condition_fn(outputs):
+                    target_id = target_map[True]
+                else:
+                    target_id = target_map[False]
+
                 message = Message(sender=source_id, content=outputs)
                 self.nodes[target_id].receive_message(message)
+
+            elif source_id in self.edges:
+                # Handle standard routing
+                for target_id in self.edges[source_id]:
+                    message = Message(sender=source_id, content=outputs)
+                    self.nodes[target_id].receive_message(message)
 
         return messages_processed
 
@@ -104,9 +146,14 @@ def create_example_graph():
         return {"value": sum(values) * 2}
 
     def add_one(messages: List[Message]) -> Dict[str, Any]:
+        print(f"messages {messages}")
         values = [msg.content["value"] for msg in messages]
         return {"value": sum(values) + 1}
 
+    def to_node2(messages: Dict[str, Any]) -> bool:
+        print(f"condition output: {messages}")
+        values = messages["value"]
+        return values // 3 == 0
     # Create graph
     graph = Graph()
 
@@ -120,11 +167,11 @@ def create_example_graph():
     graph.add_node(node3)
 
     # Add edges
-    graph.add_edge("node1", "node2")
+    graph.add_conditional_edge("node1", to_node2, {True: "node2", False: "node3"})
     graph.add_edge("node2", "node3")
 
     # Initialize with a message
-    node1.receive_message(Message("initial", {"value": 1}))
+    node1.receive_message(Message("initial", {"value": 5}))
 
     return graph
 
