@@ -4,6 +4,7 @@ import subprocess
 
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
+from litellm import completion
 
 load_dotenv()
 
@@ -37,6 +38,22 @@ def chat(messages: list[str]) -> str:
         print(f"Error: {e}")
         return
     return response.choices[0].message.content
+
+def chat_with_tools(messages: list[str], tools: list[callable], stop: list[str] = None) -> str:
+
+    try:
+        response = completion(
+                    model="gemini/gemini-2.0-flash",
+                    messages=messages,
+                    tools=[function_to_schema(x) for x in tools],
+                    tool_choice="auto",
+                    stop=stop,
+                )
+    except Exception as e:
+        print(f"Error: {e}")
+        return
+    print(f"response from litellm: {response}")
+    return response.choices[0].message
 
 
 def function_to_schema(func) -> dict:

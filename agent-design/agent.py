@@ -1,11 +1,8 @@
 import json
 import os
 import traceback
-from typing import List, Optional
 
 from dotenv import load_dotenv
-from google import genai
-from google.genai import types
 from huggingface_hub import InferenceClient
 from litellm import completion
 from openai import OpenAI
@@ -15,8 +12,11 @@ load_dotenv()
 
 default_system_message = "you are a helpful assistant. Answer the user's questions in a concise manner. Use appropriate tools when necessary."
 
+
 class Agent:
-    def __init__(self, tools=None, system_message=default_system_message, client="github"):
+    def __init__(
+        self, tools=None, system_message=default_system_message, client="github"
+    ):
         self.messages = [{"role": "system", "content": system_message}]
         self.tools = tools if tools is not None else []
         self.client_type = client
@@ -31,9 +31,7 @@ class Agent:
             case "google":
                 self.model = "gemini/gemini-2.0-flash"
             case "huggingface":
-                self.client = InferenceClient(
-                    api_key=os.getenv("HUGGINGFACE_API_KEY")
-                )
+                self.client = InferenceClient(api_key=os.getenv("HUGGINGFACE_API_KEY"))
                 self.model = "meta-llama/Llama-3.3-70B-Instruct"
             case _:
                 raise ValueError(f"Invalid client: {client}")
@@ -43,7 +41,7 @@ class Agent:
             # google's function calling does not need to be converted to schema
             case "google":
                 return completion(
-                    model=self.model, 
+                    model=self.model,
                     messages=input,
                     tools=[function_to_schema(x) for x in self.tools],
                     stop=stop,
@@ -56,7 +54,7 @@ class Agent:
                     tools=[function_to_schema(x) for x in self.tools],
                     tool_choice="auto",
                     stop=stop,
-        )
+                )
 
     def _execute_tool(self, tool_calls):
         tool_results = []
@@ -111,6 +109,5 @@ class Agent:
 
 
 if __name__ == "__main__":
-    agent = Agent(tools=[Tool.browse_file], client="github")
-    # agent = Agent()
+    agent = Agent(tools=[Tool.browse_file], client="google")
     agent.run()
