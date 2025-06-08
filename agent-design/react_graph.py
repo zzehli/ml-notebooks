@@ -15,11 +15,21 @@ def create_react_agent():
             chat_history = []
         else:
             chat_history = state[-1].state_content["chat_history"]
-
         print(f"chat_history: {chat_history}")
-        response = chat_with_tools([{"role": "system", "content": prompt}, *chat_history],
-                                    tools,
-                                    stop=["Action"])
+        prev_message = chat_history[-1]
+        # if the previous message is from the assistant, which means it is a thought, we force it to call a tool
+        if "Thought" in prev_message["content"]:
+            response = chat_with_tools(chat_history,
+                            tools,
+                            stop=["Action"],
+                            too_retuired=True)
+        else:
+            print("thinking turn")
+            response = chat_with_tools([{"role": "system", "content": prompt}, *chat_history],
+                            tools,
+                            stop=["Action"])
+           
+ 
         print(f"response: {response}")
         tool_calls = None
         if response.content:
@@ -55,11 +65,12 @@ def create_react_agent():
             print(f"performing tool call: {tool_name} with args {converted_args}")
             try:
                 res = func(**converted_args)
-                chat_history.append({"role": "user", "content": f"the result of the {tool_name} with {converted_args} call is {res}\n"})
+                chat_history.append({"role": "assistant", "content": f"""Action: calling {tool_name} with {converted_args}.\n
+Observation: the result of the {tool_name} call is {res}\n"""})
             except Exception as e:
                 raise ValueError(f"Error executing tool {tool_name} with args {args}: {e}")
 
-        return chat_history
+        return {"chat_history": chat_history, "tool_calls": None}
     
     def have_tool_call(state_content) -> str:
         """Have tool call node is responsible for checking if the assistant has a tool call."""
@@ -87,7 +98,7 @@ def create_react_agent():
         {"tool_call": "tool_node", "end": "end", "agent": "agent_node"},
     )
     graph.add_edge("tool_node", "agent_node")
-    agent.receive_message(State("initial", {"chat_history": [{"role": "user", "content": "What is the smallest prime factor of 100?"}]}))
+    agent.receive_message(State("initial", {"chat_history": [{"role": "user", "content": "What is the prime factors of 100?"}]}))
     return graph
 
 if __name__ == "__main__":

@@ -39,20 +39,19 @@ def chat(messages: list[str]) -> str:
         return
     return response.choices[0].message.content
 
-def chat_with_tools(messages: list[str], tools: list[callable], stop: list[str] = None) -> str:
+def chat_with_tools(messages: list[str], tools: list[callable], stop: list[str] = None, too_retuired: bool = False) -> str:
 
     try:
         response = completion(
                     model="gemini/gemini-2.0-flash",
                     messages=messages,
                     tools=[function_to_schema(x) for x in tools],
-                    tool_choice="auto",
+                    tool_choice="auto" if not too_retuired else "required",
                     stop=stop,
                 )
     except Exception as e:
         print(f"Error: {e}")
         return
-    print(f"response from litellm: {response}")
     return response.choices[0].message
 
 

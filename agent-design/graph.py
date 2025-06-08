@@ -131,7 +131,7 @@ class Graph:
         """Get all outputs from all nodes in the graph."""
         return self.output_trace
 
-    def run(self, max_steps=6) -> Dict[str, Any]:
+    def run(self, max_steps=50) -> Dict[str, Any]:
         """Run graph and return output trace"""
         self.step_count = 0
         while self.step_count < max_steps:
