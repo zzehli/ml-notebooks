@@ -33,7 +33,8 @@ from react_agent import ReactAgent
 prompt = """
 You are a helpful assistant that can use the Playwright library to interact with a browser.
 """
-
+# browser = sync_playwright().start().chromium.launch(headless=False)
+# page
 class PlaywrightTool:
     def __init__(self):
         self.browser = sync_playwright().start().chromium.launch(headless=False)
@@ -59,31 +60,41 @@ class PlaywrightTool:
         """Find elements by selector."""
         # TODO: return a list of elements so the model can choose
         self.elements = self.page.locator(selector).all()
+        print(self.elements)
         if self.elements:
-            return f"{len(self.elements)} elements found with selector: {selector}"
+            res = {}
+            for idx, elem in enumerate(self.elements):
+                res[idx] = elem.text_content().strip()
+            return f"Elements found with selector: {selector}: {res}"
         else:
             return f"No elements found with selector: {selector}"
     
     def find_links_with_text(self, text: str) -> str:
         """Find links with text."""
         links = self.page.locator(f"a:has-text('{text}')").all()
+
         if links:
-            return f"{len(links)} links found with text: {text}"
+            self.elements = links
+            res = {}
+            for idx, elem in enumerate(links):
+                res[idx] = elem.inner_text().strip()
+            return f"Links found with text: {text}: {res}"
         else:
             return f"No links found with text: {text}"
-
+    # browser use click event: https://github.com/browser-use/browser-use/blob/79ca05f5340c667d077d296759a84be926127dc1/browser_use/browser/session.py#L1423-L1467
     def click_element(self, index: int = 0) -> str:
         """Click an element, if no index is provided, click the first element."""
         old_url = self.page.url
         if self.elements:
             try:
-                with self.page.expect_navigation(timeout=3000) as navigation_info:
+                with self.page.expect_navigation(timeout=3000):
                     self.elements[index].click()
-                    navigation_info.value
-                    return "Element clicked, navigating to new page"
+                    if self.page.url != old_url:
+                        self.page.wait_for_load_state()
+                        return "Element clicked, navigating to new page"
+                    return "Element clicked, no navigation occurred"
             except TimeoutError as e:
                 if self.page.url == old_url:
-                    self.page.wait_for_timeout(2000)
                     return "Element clicked, no navigation occurred"
 
         else:
@@ -137,10 +148,13 @@ if __name__ == "__main__":
     print(playwright_tool.find_elements("input[name='search'], #searchInput"))
     print(playwright_tool.click_element())
     print(playwright_tool.type_text("Playwright"))
-    print(playwright_tool.find_in_page("Playwright"))
+    time.sleep(5)
     print(playwright_tool.find_elements("a:has-text('Playwright')"))
     print(playwright_tool.click_element())
+    time.sleep(5)
     print(playwright_tool.find_in_page("Ancient Greeks"))
+    print(playwright_tool.find_elements("input[name='search'], #searchInput"))
+
 
     playwright_tool.close()
     # agent.run()
