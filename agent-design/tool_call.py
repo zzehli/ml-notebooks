@@ -67,10 +67,7 @@ def main():
             args = tool_call.function.arguments
             print(f"Tool call: {tool_name} with args {args}")
             # print(f"Parsed args: {args}")
-            if tool_name == "get_name":
-                p = Person.model_validate_json(args)
-                result = Tool.get_name(p.name)
-            elif tool_name == "browse_file":
+            if tool_name == "browse_file":
                 d = Directory.model_validate_json(args)
                 result = Tool.browse_file(d.dir)
             else:
