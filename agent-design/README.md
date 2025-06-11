@@ -3,7 +3,7 @@
 [x] short memory
 [x] basic agent
 [x] react agent
-[ ] browser use agent
+[x] browser use agent
 [x] cot
 [ ] codeact agent: https://github.com/xingyaoww/code-act/blob/d607f56c9cfe9e8632ebaf65dcaf2b4b7fe1c6f8/mint/prompt/templates/template_with_tool.txt
 [x] graph-based framework (workflow)
@@ -15,6 +15,12 @@
 * LLMs can write code as part of their answers, however, CodeAct proposes using code as THE language for LLMs; they will describe things in code instead of in natural language.
 * the environment executes the action, not LLM
 * tool call is a trained behavior; LLM is trained to output strings in specified shapes (in this sense, tool call depends on structured output)
-
+* there are many ways to reinforce structured output
+    * training
+    * inference time: 
+        * logit post-processing: Outlines, and lm-format-enforcer; build a representation (tree, finite-state-machine) then prune logit to remove disallowed elements, see: https://dottxt-ai.github.io/outlines/latest/reference/generation/structured_generation_explanation/ and https://github.com/noamgat/lm-format-enforcer, https://www.tamingllms.com/notebooks/structured_output.html and https://www.deeplearning.ai/short-courses/getting-structured-llm-output/
+        * retry-based
+* agent implementation: https://www.lutzroeder.com/blog/2025-05-24-tiny-agents/
+* how does codeagent call tools? is it through LLM api's tools parameter or just put them in the response with tags? (the former) https://deepwiki.com/search/how-does-codeagent-call-tools_5c6cdf61-d2c9-4b7e-8abb-ba05e49d0968
 # Note
 * `react_graph` does not always perform function calls.

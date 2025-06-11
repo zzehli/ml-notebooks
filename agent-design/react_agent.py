@@ -147,7 +147,7 @@ class ReactAgent(Agent):
                 thought_response = self._thought()
                 if "Done." in thought_response.choices[0].message.content:
                     break
-                input("Press Enter to continue...")
+                # input("Press Enter to continue...")
                 response = self._call([{"role": "assistant", "content": self._action_sequence}], stop=["Observation:"])
                 if response.choices[0].message.tool_calls:
                     for tool_call in response.choices[0].message.tool_calls:
