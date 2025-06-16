@@ -38,7 +38,6 @@ class Agent:
 
     def _call(self, input, stop=None):
         match self.client_type:
-            # google's function calling does not need to be converted to schema
             case "google":
                 return completion(
                     model=self.model,

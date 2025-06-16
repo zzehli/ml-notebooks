@@ -21,6 +21,8 @@
         * logit post-processing: Outlines, and lm-format-enforcer; build a representation (tree, finite-state-machine) then prune logit to remove disallowed elements, see: https://dottxt-ai.github.io/outlines/latest/reference/generation/structured_generation_explanation/ and https://github.com/noamgat/lm-format-enforcer, https://www.tamingllms.com/notebooks/structured_output.html and https://www.deeplearning.ai/short-courses/getting-structured-llm-output/
         * retry-based
 * agent implementation: https://www.lutzroeder.com/blog/2025-05-24-tiny-agents/
-* how does codeagent call tools? is it through LLM api's tools parameter or just put them in the response with tags? (the former) https://deepwiki.com/search/how-does-codeagent-call-tools_5c6cdf61-d2c9-4b7e-8abb-ba05e49d0968
+# TODO
+- [ ] change observation to user message
+- [ ] refactor thought and action into one call
 # Note
 * `react_graph` does not always perform function calls.

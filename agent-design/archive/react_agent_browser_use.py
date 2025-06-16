@@ -1,6 +1,8 @@
 # https://github.com/ysymyth/ReAct/blob/master/wikienv.py
 # https://colab.research.google.com/drive/1OqYAKT1OcAiQgIRE5PAAHBI4CB2lG-4n?usp=sharing#scrollTo=mAFWR3TeHkJs
 
+# V1: this version is archived
+
 import re
 import time
 from typing import List
@@ -16,11 +18,12 @@ You have a list of tools to navigate the web. Prioritize finding the information
 To use these tools effectively:
 1. First navigate to a page using navigate_to()
 2. Use find_elements() or find_links_with_text() to locate elements
-3. Interact with elements using click_element() or type_text()
+3. Interact with elements using click_element() or type_text(). Only interact with visible elements.
 4. Use find_in_page() to search for specific content
+5. Retry with different tools or index if the action fails.
 
 Remember:
-- Elements are stored globally after finding them
+- Elements are stored globally after finding them, so you can access the same elements in different tools.
 - Click operations may trigger navigation
 - Some operations may require waiting for page loads
 - Input elements need type_text() rather than click_element()
