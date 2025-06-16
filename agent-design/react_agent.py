@@ -56,6 +56,7 @@ def find_interactive_elements() -> str:
                     type: el.type,
                     value: el.value,
                     placeholder: el.placeholder,
+                    role: el.role,
                     name: el.name
                 })""")
                 res[idx] = f"Input: {input_info}"
@@ -66,7 +67,8 @@ def find_interactive_elements() -> str:
                 })""")
                 res[idx] = f"Link: {link_info}"
             else:
-                text = elem.inner_text().strip()
+                text = tag_name + ": "
+                text += elem.inner_text().strip()
                 if text:
                     res[idx] = text
                 else:
@@ -81,6 +83,10 @@ def find_interactive_elements() -> str:
                         text: el.textContent.trim()
                     })""")
                     res[idx] = f"Element: {attrs}"
+        print(
+            "Interactive elements found:\n"
+            + "\n".join(f"  {k}: {v}" for k, v in res.items())
+        )
         return f"Interactive elements found: {res}"
     else:
         return "No interactive elements found"
@@ -215,10 +221,9 @@ class ReactAgent(Agent):
                         }
                     )
                     print("assistant: " + response.choices[0].message.content)
-                if not response.choices[0].message.tool_calls:
-                    break
-                for tool_call in response.choices[0].message.tool_calls:
-                    self._action(tool_call)
+                if response.choices[0].message.tool_calls:
+                    for tool_call in response.choices[0].message.tool_calls:
+                        self._action(tool_call)
                 step += 1
             except Exception as e:
                 print(f"Error: {e}")
@@ -240,4 +245,6 @@ if __name__ == "__main__":
         client="github",
     )
     agent.run()
+    # print(navigate_to("https://www.wikipedia.org/"))
+    # print(find_interactive_elements())
     close()

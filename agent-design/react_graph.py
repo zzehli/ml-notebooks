@@ -2,15 +2,23 @@ import inspect
 import json
 from typing import Any, Dict, List
 
+from archive.react_agent import (
+    divide,
+    get_factors,
+    prompt,
+    save_factors,
+    smallest_prime_factor,
+)
 from graph import Graph, Node, State
-from react_agent import divide, get_factors, prompt, save_factors, smallest_prime_factor
 from utils import chat_with_tools
 
 tools = [divide, save_factors, get_factors, smallest_prime_factor]
+
+
 def create_react_agent():
     def agent_node(state: List[State]) -> Dict[str, Any]:
         """Agent node is the main node that will be used to generate the response."""
-        
+
         if not state:
             chat_history = []
         else:
@@ -19,17 +27,17 @@ def create_react_agent():
         prev_message = chat_history[-1]
         # if the previous message is from the assistant, which means it is a thought, we force it to call a tool
         if "Thought" in prev_message["content"]:
-            response = chat_with_tools(chat_history,
-                            tools,
-                            stop=["Action"],
-                            too_retuired=True)
+            response = chat_with_tools(
+                chat_history, tools, stop=["Action"], too_retuired=True
+            )
         else:
             print("thinking turn")
-            response = chat_with_tools([{"role": "system", "content": prompt}, *chat_history],
-                            tools,
-                            stop=["Action"])
-           
- 
+            response = chat_with_tools(
+                [{"role": "system", "content": prompt}, *chat_history],
+                tools,
+                stop=["Action"],
+            )
+
         print(f"response: {response}")
         tool_calls = None
         if response.content:
@@ -51,40 +59,53 @@ def create_react_agent():
             # the tool name has to be in the tool list
             func = tool_dict[tool_name]
             sig = inspect.signature(func)
-            
+
             # Convert arguments to their expected types
             converted_args = {}
             for param_name, param in sig.parameters.items():
                 if param_name in args:
-                    expected_type = param.annotation if param.annotation != inspect._empty else str
+                    expected_type = (
+                        param.annotation if param.annotation != inspect._empty else str
+                    )
                     try:
                         converted_args[param_name] = expected_type(args[param_name])
                     except (ValueError, TypeError) as e:
-                        raise ValueError(f"Error converting argument {param_name} to type {expected_type.__name__}: {e}")
-            
+                        raise ValueError(
+                            f"Error converting argument {param_name} to type {expected_type.__name__}: {e}"
+                        )
+
             print(f"performing tool call: {tool_name} with args {converted_args}")
             try:
                 res = func(**converted_args)
-                chat_history.append({"role": "assistant", "content": f"""Action: calling {tool_name} with {converted_args}.\n
-Observation: the result of the {tool_name} call is {res}\n"""})
+                chat_history.append(
+                    {
+                        "role": "assistant",
+                        "content": f"""Action: calling {tool_name} with {converted_args}.\n
+Observation: the result of the {tool_name} call is {res}\n""",
+                    }
+                )
             except Exception as e:
-                raise ValueError(f"Error executing tool {tool_name} with args {args}: {e}")
+                raise ValueError(
+                    f"Error executing tool {tool_name} with args {args}: {e}"
+                )
 
         return {"chat_history": chat_history, "tool_calls": None}
-    
+
     def have_tool_call(state_content) -> str:
         """Have tool call node is responsible for checking if the assistant has a tool call."""
         chat_history = state_content["chat_history"]
         tool_calls = state_content["tool_calls"]
         if chat_history[-1]["role"] != "assistant":
-            raise ValueError("Have tool call node must receive a message from the assistant.")
+            raise ValueError(
+                "Have tool call node must receive a message from the assistant."
+            )
         if tool_calls:
             return "tool_call"
         elif "Done" in chat_history[-1]["content"]:
             return "end"
         else:
             return "agent"
-    
+
     graph = Graph()
     agent = Node("agent_node", agent_node)
     tool = Node("tool_node", tool_node)
@@ -98,13 +119,23 @@ Observation: the result of the {tool_name} call is {res}\n"""})
         {"tool_call": "tool_node", "end": "end", "agent": "agent_node"},
     )
     graph.add_edge("tool_node", "agent_node")
-    agent.receive_message(State("initial", {"chat_history": [{"role": "user", "content": "What is the prime factors of 100?"}]}))
+    agent.receive_message(
+        State(
+            "initial",
+            {
+                "chat_history": [
+                    {"role": "user", "content": "What is the prime factors of 100?"}
+                ]
+            },
+        )
+    )
     return graph
+
 
 if __name__ == "__main__":
     # Create and run example graph
     graph = create_react_agent()
-    
+
     # Run until no more messages are being processed
     res = graph.run()
     print("==================run trace====================")

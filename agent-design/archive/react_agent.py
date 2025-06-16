@@ -100,8 +100,8 @@ def get_factors() -> list[int]:
 
 
 class ReactAgent(Agent):
-    def __init__(self, tools = None, system_message=None, client="github"):
-        super().__init__(tools = tools, system_message=system_message, client=client)
+    def __init__(self, tools=None, system_message=None, client="github"):
+        super().__init__(tools=tools, system_message=system_message, client=client)
         self._action_sequence = ""
 
     def _thought(self):
@@ -126,17 +126,21 @@ class ReactAgent(Agent):
         # the tool name has to be in the tool list
         func = tool_dict[tool_name]
         sig = inspect.signature(func)
-        
+
         # Convert arguments to their expected types
         converted_args = {}
         for param_name, param in sig.parameters.items():
             if param_name in args:
-                expected_type = param.annotation if param.annotation != inspect._empty else str
+                expected_type = (
+                    param.annotation if param.annotation != inspect._empty else str
+                )
                 try:
                     converted_args[param_name] = expected_type(args[param_name])
                 except (ValueError, TypeError) as e:
-                    raise ValueError(f"Error converting argument {param_name} to type {expected_type.__name__}: {e}")
-        
+                    raise ValueError(
+                        f"Error converting argument {param_name} to type {expected_type.__name__}: {e}"
+                    )
+
         print(f"performing tool call: {tool_name} with args {converted_args}")
         try:
             res = func(**converted_args)
@@ -157,15 +161,22 @@ class ReactAgent(Agent):
                 thought_response = self._thought()
                 if thought_response == "Done.":
                     break
-                elif thought_response == "Tool call" or thought_response == "No response":
+                elif (
+                    thought_response == "Tool call" or thought_response == "No response"
+                ):
                     print(f"unexpected response: {thought_response}")
                     continue
                 # print(f"action_sequence after thought: {self._action_sequence}")
-                response = self._call([{"role": "assistant", "content": self._action_sequence}], stop=["Observation:"])
+                response = self._call(
+                    [{"role": "assistant", "content": self._action_sequence}],
+                    stop=["Observation:"],
+                )
                 if response.choices[0].message.tool_calls:
                     for tool_call in response.choices[0].message.tool_calls:
                         self._action(tool_call)
-                print(f"action_sequence after action and observation: {self._action_sequence}")
+                print(
+                    f"action_sequence after action and observation: {self._action_sequence}"
+                )
                 print("--------------------------------")
                 self.messages.append(
                     {"role": "assistant", "content": self._action_sequence}
@@ -188,6 +199,6 @@ if __name__ == "__main__":
             get_factors,
         ],
         system_message=prompt,
-        client="google"
+        client="google",
     )
     agent.run()
