@@ -2,6 +2,7 @@ import inspect
 import os
 import subprocess
 
+from colorama import Fore, Style
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 from litellm import completion
@@ -39,16 +40,21 @@ def chat(messages: list[str]) -> str:
         return
     return response.choices[0].message.content
 
-def chat_with_tools(messages: list[str], tools: list[callable], stop: list[str] = None, too_retuired: bool = False) -> str:
 
+def chat_with_tools(
+    messages: list[str],
+    tools: list[callable],
+    stop: list[str] = None,
+    too_retuired: bool = False,
+) -> str:
     try:
         response = completion(
-                    model="gemini/gemini-2.0-flash",
-                    messages=messages,
-                    tools=[function_to_schema(x) for x in tools],
-                    tool_choice="auto" if not too_retuired else "required",
-                    stop=stop,
-                )
+            model="gemini/gemini-2.0-flash",
+            messages=messages,
+            tools=[function_to_schema(x) for x in tools],
+            tool_choice="auto" if not too_retuired else "required",
+            stop=stop,
+        )
     except Exception as e:
         print(f"Error: {e}")
         return
@@ -101,3 +107,14 @@ def function_to_schema(func) -> dict:
             },
         },
     }
+
+
+def print_step_line(step_num):
+    width = os.get_terminal_size().columns
+    text = f" step {step_num} "
+    padding = width - len(text)
+    left_pad = padding // 2
+    right_pad = padding - left_pad
+
+    line = "─" * left_pad + text + "─" * right_pad
+    print(f"{Fore.YELLOW}{line}{Style.RESET_ALL}")

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "accelerate>=1.7.0",
+    "colorama>=0.4.6",
     "google-genai>=1.18.0",
     "huggingface-hub>=0.31.2",
     "litellm>=1.72.0",
@@ -14,6 +15,7 @@ dependencies = [
     "pydantic>=2.11.4",
     "pytest-playwright>=0.7.0",
     "python-dotenv>=1.1.0",
+    "rich>=14.0.0",
     "torch>=2.7.0",
     "transformers>=4.51.3",
     "typing>=3.10.0.0",
