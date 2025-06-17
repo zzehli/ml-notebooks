@@ -33,6 +33,11 @@ class Agent:
             case "huggingface":
                 self.client = InferenceClient(api_key=os.getenv("HUGGINGFACE_API_KEY"))
                 self.model = "meta-llama/Llama-3.3-70B-Instruct"
+            case "qwen":
+                self.client = InferenceClient(
+                    api_key=os.getenv("HUGGINGFACE_API_KEY"),
+                )
+                self.model = "Qwen/Qwen3-14B"
             case _:
                 raise ValueError(f"Invalid client: {client}")
 

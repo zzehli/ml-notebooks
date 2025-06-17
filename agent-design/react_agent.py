@@ -10,7 +10,7 @@ from utils import print_step_line
 
 prompt = """
 You are a helpful agent that can think and use tools. Use the tools to solve the problem step by step.
-When you use tools, always provide your thought process along with the tool call.
+When you use tools, always provide a message to explain your plan along with the tool call. When you trying to find information, only use the snapshot tool after you tried find_in_page tool. /no_think
 """
 
 
@@ -37,18 +37,21 @@ def navigate_to(url: str):
     return "Navigated to " + url
 
 
-def find_interactive_elements() -> str:
-    """Generate a list of interactive elements along with a reference id for each element"""
+def snapshot() -> str:
+    """Generate a snapshot of the current page, including all interactive elements, text, and links. This is slow, so use it sparingly."""
     global elements
     # Select only interactive elements directly
+    
     elements = (
-        page.locator("input, a, button, select, textarea, summary")
+        page.locator("input, a, button, select, textarea, summary, h1, h2, h3, h4, h5, h6, p, span")
         .filter(visible=True)
         .all()
     )
+    # match by div is too slow
+    # elements = page.locator("div").filter(has=page.locator("h1, h2, h3, h4, h5, h6, p, span"), has_not=page.locator("header, footer, nav"), visible=True).all()
     if elements:
         res = {}
-        for idx, elem in enumerate(elements):
+        for idx, elem in enumerate(elements[:100]):
             tag_name = elem.evaluate("el => el.tagName.toLowerCase()")
 
             if tag_name == "input":
@@ -83,10 +86,6 @@ def find_interactive_elements() -> str:
                         text: el.textContent.trim()
                     })""")
                     res[idx] = f"Element: {attrs}"
-        print(
-            "Interactive elements found:\n"
-            + "\n".join(f"  {k}: {v}" for k, v in res.items())
-        )
         return f"Interactive elements found: {res}"
     else:
         return "No interactive elements found"
@@ -158,6 +157,10 @@ def find_in_page(keyword: str) -> List[str]:
 
     return f"The following sentences are found: {sentences}"
 
+def user_input(feedback: str):
+    """Solicit user input when the agent needs to know more about the current task,unclear how to proceed or is finished with the task."""
+    user_input = input("Feedback: ")
+    return f"User input: {user_input}"
 
 def close():
     """Close the browser."""
@@ -237,14 +240,16 @@ if __name__ == "__main__":
     agent = ReactAgent(
         tools=[
             navigate_to,
-            find_interactive_elements,
+            snapshot,
             find_in_page,
             type_text,
+            click_element,
+            user_input,
         ],
         system_message=prompt,
-        client="github",
+        client="qwen",
     )
     agent.run()
-    # print(navigate_to("https://www.wikipedia.org/"))
-    # print(find_interactive_elements())
+    # print(navigate_to("https://www.nytimes.com/"))
+    # print(snapshot())
     close()
