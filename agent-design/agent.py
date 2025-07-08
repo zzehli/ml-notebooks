@@ -15,11 +15,12 @@ default_system_message = "you are a helpful assistant. Answer the user's questio
 
 class Agent:
     def __init__(
-        self, tools=None, system_message=default_system_message, client="github"
+        self, tools=None, system_message=default_system_message, client="github", response_format=None
     ):
         self.messages = [{"role": "system", "content": system_message}]
         self.tools = tools if tools is not None else []
         self.client_type = client
+        self.response_format = response_format
         # switched to openai since it has better tool calling
         match client:
             case "github":
@@ -41,7 +42,7 @@ class Agent:
             case _:
                 raise ValueError(f"Invalid client: {client}")
 
-    def _call(self, input, stop=None):
+    def call(self, input, stop=None):
         match self.client_type:
             case "google":
                 return completion(
@@ -50,6 +51,7 @@ class Agent:
                     tools=[function_to_schema(x) for x in self.tools],
                     stop=stop,
                     tool_choice="auto",
+                    response_format=self.response_format,
                 )
             case _:
                 return self.client.chat.completions.create(
@@ -58,6 +60,7 @@ class Agent:
                     tools=[function_to_schema(x) for x in self.tools],
                     tool_choice="auto",
                     stop=stop,
+                    response_format=self.response_format,
                 )
 
     def _execute_tool(self, tool_calls):
@@ -87,7 +90,7 @@ class Agent:
                     print("Agent terminated.")
                     break
                 self.messages.append({"role": "user", "content": user_input})
-                response = self._call(self.messages)
+                response = self.call(self.messages)
                 if response.choices[0].message.tool_calls:
                     tool_results = self._execute_tool(
                         response.choices[0].message.tool_calls

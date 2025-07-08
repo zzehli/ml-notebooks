@@ -214,7 +214,7 @@ class ReactAgent(Agent):
                 input("Press Enter to continue...")
 
                 print_step_line(step)
-                response = self._call(self.messages)
+                response = self.call(self.messages)
 
                 if response.choices[0].message.content:
                     self.messages.append(
@@ -247,7 +247,7 @@ if __name__ == "__main__":
             user_input,
         ],
         system_message=prompt,
-        client="qwen",
+        client="github",
     )
     agent.run()
     # print(navigate_to("https://www.nytimes.com/"))

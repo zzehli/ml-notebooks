@@ -1,14 +1,14 @@
 # Agent design:
-[x] tool calling
-[x] short memory
-[x] basic agent
-[x] react agent
-[x] browser use agent
-[x] cot
-[ ] codeact agent: https://github.com/xingyaoww/code-act/blob/d607f56c9cfe9e8632ebaf65dcaf2b4b7fe1c6f8/mint/prompt/templates/template_with_tool.txt
-[x] graph-based framework (workflow)
-[ ] multi-agents (handover)
-[ ] rag
+- [x] tool calling
+- [x] short memory
+- [x] basic agent
+- [x] react agent
+- [x] browser use agent
+- [x] cot
+- [x] codeact agent
+- [x] graph-based framework (workflow)
+- [ ] multi-agents (handover)
+- [ ] rag
 
 ## Talking points
 * Is ReAct a concept of LLM performing action or address hallucination?
@@ -21,6 +21,8 @@
         * logit post-processing: Outlines, and lm-format-enforcer; build a representation (tree, finite-state-machine) then prune logit to remove disallowed elements, see: https://dottxt-ai.github.io/outlines/latest/reference/generation/structured_generation_explanation/ and https://github.com/noamgat/lm-format-enforcer, https://www.tamingllms.com/notebooks/structured_output.html and https://www.deeplearning.ai/short-courses/getting-structured-llm-output/
         * retry-based
 * agent implementation: https://www.lutzroeder.com/blog/2025-05-24-tiny-agents/
+* how to combine thinking-action into the same call? 
+* How to handle loop exit condition? 
 # TODO
 - [ ] change observation to user message
 - [ ] refactor thought and action into one call

@@ -106,7 +106,7 @@ class ReactAgent(Agent):
 
     def _thought(self):
         try:
-            response = self._call(self.messages, stop=["Action:"])
+            response = self.call(self.messages, stop=["Action:"])
             if response.choices[0].message.content:
                 self._action_sequence += f"{response.choices[0].message.content}\n"
                 return response.choices[0].message.content
@@ -167,7 +167,7 @@ class ReactAgent(Agent):
                     print(f"unexpected response: {thought_response}")
                     continue
                 # print(f"action_sequence after thought: {self._action_sequence}")
-                response = self._call(
+                response = self.call(
                     [{"role": "assistant", "content": self._action_sequence}],
                     stop=["Observation:"],
                 )
