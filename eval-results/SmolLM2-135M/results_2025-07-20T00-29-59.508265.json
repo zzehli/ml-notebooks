@@ -1,0 +1,118 @@
+{
+  "config_general": {
+    "lighteval_sha": "?",
+    "num_fewshot_seeds": 1,
+    "max_samples": null,
+    "job_id": 0,
+    "start_time": 11061198.408112109,
+    "end_time": 11061303.402061164,
+    "total_evaluation_time_secondes": "104.99394905567169",
+    "model_name": "HuggingFaceTB/SmolLM2-135M",
+    "model_sha": "",
+    "model_dtype": null,
+    "model_size": null,
+    "generation_parameters": {
+      "early_stopping": null,
+      "repetition_penalty": null,
+      "frequency_penalty": null,
+      "length_penalty": null,
+      "presence_penalty": null,
+      "max_new_tokens": null,
+      "min_new_tokens": null,
+      "seed": null,
+      "stop_tokens": null,
+      "temperature": null,
+      "top_k": null,
+      "min_p": null,
+      "top_p": null,
+      "truncate_prompt": null,
+      "response_format": null
+    }
+  },
+  "results": {
+    "leaderboard|winogrande|0": {
+      "acc": 0.5224940805051302,
+      "acc_stderr": 0.014038257824059864
+    },
+    "all": {
+      "acc": 0.5224940805051302,
+      "acc_stderr": 0.014038257824059864
+    }
+  },
+  "versions": {
+    "leaderboard|winogrande|0": 0
+  },
+  "config_tasks": {
+    "leaderboard|winogrande": {
+      "name": "winogrande",
+      "prompt_function": "winogrande",
+      "hf_repo": "winogrande",
+      "hf_subset": "winogrande_xl",
+      "metric": [
+        {
+          "metric_name": "acc",
+          "higher_is_better": true,
+          "category": "8",
+          "use_case": "1",
+          "sample_level_fn": "compute",
+          "corpus_level_fn": "mean"
+        }
+      ],
+      "hf_revision": null,
+      "hf_filter": null,
+      "hf_avail_splits": [
+        "train",
+        "test",
+        "validation"
+      ],
+      "trust_dataset": true,
+      "evaluation_splits": [
+        "validation"
+      ],
+      "few_shots_split": null,
+      "few_shots_select": "random_sampling",
+      "generation_size": -1,
+      "generation_grammar": null,
+      "stop_sequence": [
+        "\n"
+      ],
+      "num_samples": null,
+      "suite": [
+        "leaderboard"
+      ],
+      "original_num_docs": 1267,
+      "effective_num_docs": 1267,
+      "must_remove_duplicate_docs": false,
+      "version": 0
+    }
+  },
+  "summary_tasks": {
+    "leaderboard|winogrande|0": {
+      "hashes": {
+        "hash_examples": "087d5d1a1afd4c7b",
+        "hash_full_prompts": "087d5d1a1afd4c7b",
+        "hash_input_tokens": "13e09e09008d8b4f",
+        "hash_cont_tokens": "a582506195155894"
+      },
+      "truncated": 0,
+      "non_truncated": 1267,
+      "padded": 0,
+      "non_padded": 2534,
+      "effective_few_shots": 0.0,
+      "num_truncated_few_shots": 0
+    }
+  },
+  "summary_general": {
+    "hashes": {
+      "hash_examples": "b9a49975cc41fab7",
+      "hash_full_prompts": "b9a49975cc41fab7",
+      "hash_input_tokens": "5baf613e29ff1004",
+      "hash_cont_tokens": "24ca86b69254cd93"
+    },
+    "truncated": 0,
+    "non_truncated": 1267,
+    "padded": 0,
+    "non_padded": 2534,
+    "num_truncated_few_shots": 0
+  }
+}

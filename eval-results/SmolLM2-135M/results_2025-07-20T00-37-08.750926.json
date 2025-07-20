@@ -1,0 +1,130 @@
+{
+  "config_general": {
+    "lighteval_sha": "?",
+    "num_fewshot_seeds": 1,
+    "max_samples": null,
+    "job_id": 0,
+    "start_time": 11061621.979433669,
+    "end_time": 11061732.654198,
+    "total_evaluation_time_secondes": "110.6747643314302",
+    "model_name": "HuggingFaceTB/SmolLM2-135M",
+    "model_sha": "",
+    "model_dtype": null,
+    "model_size": null,
+    "generation_parameters": {
+      "early_stopping": null,
+      "repetition_penalty": null,
+      "frequency_penalty": null,
+      "length_penalty": null,
+      "presence_penalty": null,
+      "max_new_tokens": null,
+      "min_new_tokens": null,
+      "seed": null,
+      "stop_tokens": null,
+      "temperature": null,
+      "top_k": null,
+      "min_p": null,
+      "top_p": null,
+      "truncate_prompt": null,
+      "response_format": null
+    }
+  },
+  "results": {
+    "leaderboard|arc:challenge|0": {
+      "acc": 0.28242320819112626,
+      "acc_stderr": 0.013155456884097222,
+      "acc_norm": 0.29180887372013653,
+      "acc_norm_stderr": 0.013284525292403506
+    },
+    "all": {
+      "acc": 0.28242320819112626,
+      "acc_stderr": 0.013155456884097222,
+      "acc_norm": 0.29180887372013653,
+      "acc_norm_stderr": 0.013284525292403506
+    }
+  },
+  "versions": {
+    "leaderboard|arc:challenge|0": 0
+  },
+  "config_tasks": {
+    "leaderboard|arc:challenge": {
+      "name": "arc:challenge",
+      "prompt_function": "arc",
+      "hf_repo": "ai2_arc",
+      "hf_subset": "ARC-Challenge",
+      "metric": [
+        {
+          "metric_name": "acc",
+          "higher_is_better": true,
+          "category": "8",
+          "use_case": "1",
+          "sample_level_fn": "compute",
+          "corpus_level_fn": "mean"
+        },
+        {
+          "metric_name": "acc_norm",
+          "higher_is_better": true,
+          "category": "8",
+          "use_case": "1",
+          "sample_level_fn": "compute",
+          "corpus_level_fn": "mean"
+        }
+      ],
+      "hf_revision": null,
+      "hf_filter": null,
+      "hf_avail_splits": [
+        "train",
+        "test"
+      ],
+      "trust_dataset": true,
+      "evaluation_splits": [
+        "test"
+      ],
+      "few_shots_split": null,
+      "few_shots_select": "random_sampling_from_train",
+      "generation_size": 1,
+      "generation_grammar": null,
+      "stop_sequence": [
+        "\n"
+      ],
+      "num_samples": null,
+      "suite": [
+        "leaderboard",
+        "arc"
+      ],
+      "original_num_docs": 1172,
+      "effective_num_docs": 1172,
+      "must_remove_duplicate_docs": false,
+      "version": 0
+    }
+  },
+  "summary_tasks": {
+    "leaderboard|arc:challenge|0": {
+      "hashes": {
+        "hash_examples": "17b0cae357c0259e",
+        "hash_full_prompts": "17b0cae357c0259e",
+        "hash_input_tokens": "c8c7df76162a72c4",
+        "hash_cont_tokens": "8a6142410aa83459"
+      },
+      "truncated": 0,
+      "non_truncated": 1172,
+      "padded": 0,
+      "non_padded": 4687,
+      "effective_few_shots": 0.0,
+      "num_truncated_few_shots": 0
+    }
+  },
+  "summary_general": {
+    "hashes": {
+      "hash_examples": "aaa6929c6d3771fb",
+      "hash_full_prompts": "aaa6929c6d3771fb",
+      "hash_input_tokens": "98728338aa08742d",
+      "hash_cont_tokens": "67a0705c72d78f77"
+    },
+    "truncated": 0,
+    "non_truncated": 1172,
+    "padded": 0,
+    "non_padded": 4687,
+    "num_truncated_few_shots": 0
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "config_general": {
+    "lighteval_sha": "?",
+    "num_fewshot_seeds": 1,
+    "max_samples": null,
+    "job_id": 0,
+    "start_time": 11060124.86799732,
+    "end_time": 11060252.415701663,
+    "total_evaluation_time_secondes": "127.5477043427527",
+    "model_name": "HuggingFaceTB/SmolLM2-135M",
+    "model_sha": "",
+    "model_dtype": null,
+    "model_size": null,
+    "generation_parameters": {
+      "early_stopping": null,
+      "repetition_penalty": null,
+      "frequency_penalty": null,
+      "length_penalty": null,
+      "presence_penalty": null,
+      "max_new_tokens": null,
+      "min_new_tokens": null,
+      "seed": null,
+      "stop_tokens": null,
+      "temperature": null,
+      "top_k": null,
+      "min_p": null,
+      "top_p": null,
+      "truncate_prompt": null,
+      "response_format": null
+    }
+  },
+  "results": {
+    "leaderboard|gsm8k|0": {
+      "qem": 0.0,
+      "qem_stderr": 0.0
+    },
+    "all": {
+      "qem": 0.0,
+      "qem_stderr": 0.0
+    }
+  },
+  "versions": {
+    "leaderboard|gsm8k|0": 0
+  },
+  "config_tasks": {
+    "leaderboard|gsm8k": {
+      "name": "gsm8k",
+      "prompt_function": "gsm8k",
+      "hf_repo": "gsm8k",
+      "hf_subset": "main",
+      "metric": [
+        {
+          "metric_name": "qem",
+          "higher_is_better": true,
+          "category": "3",
+          "use_case": "5",
+          "sample_level_fn": "compute",
+          "corpus_level_fn": "mean"
+        }
+      ],
+      "hf_revision": null,
+      "hf_filter": null,
+      "hf_avail_splits": [
+        "train",
+        "test"
+      ],
+      "trust_dataset": true,
+      "evaluation_splits": [
+        "test"
+      ],
+      "few_shots_split": null,
+      "few_shots_select": "random_sampling_from_train",
+      "generation_size": 256,
+      "generation_grammar": null,
+      "stop_sequence": [
+        "Question:"
+      ],
+      "num_samples": null,
+      "suite": [
+        "leaderboard"
+      ],
+      "original_num_docs": 1319,
+      "effective_num_docs": 1319,
+      "must_remove_duplicate_docs": false,
+      "version": 0
+    }
+  },
+  "summary_tasks": {
+    "leaderboard|gsm8k|0": {
+      "hashes": {
+        "hash_examples": "0ed016e24e7512fd",
+        "hash_full_prompts": "0ed016e24e7512fd",
+        "hash_input_tokens": "3de794f86ca2e7e4",
+        "hash_cont_tokens": "b9cfae9468d7acc4"
+      },
+      "truncated": 0,
+      "non_truncated": 1319,
+      "padded": 0,
+      "non_padded": 1319,
+      "effective_few_shots": 0.0,
+      "num_truncated_few_shots": 0
+    }
+  },
+  "summary_general": {
+    "hashes": {
+      "hash_examples": "bc71463e88551d0e",
+      "hash_full_prompts": "bc71463e88551d0e",
+      "hash_input_tokens": "f5b1d29a8a7e60bc",
+      "hash_cont_tokens": "a6141ba37835d0cd"
+    },
+    "truncated": 0,
+    "non_truncated": 1319,
+    "padded": 0,
+    "non_padded": 1319,
+    "num_truncated_few_shots": 0
+  }
+}
